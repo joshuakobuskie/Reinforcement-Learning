@@ -2,15 +2,16 @@ import highway_env
 max_iters = 100
 
 #Paper configurations
-#IDMVehcile uses the IDM for longitudinal movement and MOBIL for lateral movement
-vehicles_type = highway_env.vehicle.behavior.IDMVehicle
+#Each vehicle was randomly generated within the specified range beneath the vehicles, and the initial velocity was also randomly set between 5 to 15 m/s.
 initial_min_speed = 5
 initial_max_speed = 15
 
-#Includes agent vehicle
-#Not what we needed, this limits vehicles not observations
-#vehicles_count = 4
+#HDV were implemented using Intelligent Driver Model (IDM) [9] and Minimizing Overall Braking Induced by Lane change (MOBIL)
+#IDMVehcile uses the IDM for longitudinal movement and MOBIL for lateral movement
+vehicles_type = highway_env.vehicle.behavior.IDMVehicle
 
+
+#Receives observations of up to three obstacles or vehicles in its vicinity
 #Set observation limit to 3 vehicles
 observation_type =  "Kinematics"
 observation_vehicles_count = 3
@@ -18,8 +19,14 @@ observation_vehicles_count = 3
 #View only longitudinal coordinate, lateral coordinate, longitudinal velocity, and lateral velocity
 observation_features = ["x", "y", "vx", "vy"]
 
+#An episode would terminate if a collision occurred or the ego vehicle passed a distance of 370m
 #Maximum distance of simulation
 max_distance = 370
+
+#can perform five actions (Lane left, Idle, Lane right, faster, slower) through acceleration and steering control.
+
+
+# The speed range for each vehicle is limited to 5-15 m/s.
 
 #defaults from the highway env
 action = {'type': 'DiscreteMetaAction'}

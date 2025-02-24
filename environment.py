@@ -6,7 +6,7 @@ import config
 import numpy as np
 
 def euclidian_distance(pos_1, pos_2):
-    return np.linalg.norm(np.array(pos_2) - np.array(pos_1))
+    return np.linalg.norm(np.array(pos_1) - np.array(pos_2))
 
 env = gymnasium.make('merge-v0', render_mode='rgb_array', config={"other_vehicles_type": config.other_vehicles_type, "observation": {"type": config.observation_type, "vehicles_count": config.observation_vehicles_count, "features": config.observation_features}})
  
@@ -24,15 +24,21 @@ for vehicle in env.unwrapped.road.vehicles:
 
 env.reset()
 
-iters = 0
+#Replaced with distance
+#iters = 0
+
+#Save start
+start_pos = np.copy(env.unwrapped.vehicle.position)
 done = False
 #Changed to stop on crash
-while not done and iters < config.max_iters:
+while not done and euclidian_distance(start_pos, env.unwrapped.vehicle.position) < config.max_distance:
+    print(euclidian_distance(start_pos, env.unwrapped.vehicle.position))
     action = env.unwrapped.action_type.actions_indexes["IDLE"]
     obs, reward, done, truncated, info = env.step(action)
     env.render()
     #Confirmed working as intended: 3 objects with only x,y,vx,vy
-    #print(obs)
-    iters += 1
+    print(obs)
+    #iters += 1
+
 
 pprint.pprint(env.unwrapped.config)
