@@ -7,6 +7,9 @@ vehicles_type = highway_env.vehicle.behavior.IDMVehicle
 initial_min_speed = 5
 initial_max_speed = 15
 
+#Include agent vehicle
+vehicles_count = 4
+
 #defaults from the highway env
 action = {'type': 'DiscreteMetaAction'}
 centering_position = [0.3, 0.5]
@@ -34,5 +37,5 @@ screen_height = 150
 screen_width = 600
 show_trajectories = False
 simulation_frequency = 15
-vehicles_count = 50
+
 vehicles_density = 1
