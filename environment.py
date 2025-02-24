@@ -21,8 +21,11 @@ env = gymnasium.make('merge-v0', render_mode='rgb_array', config={"other_vehicle
 
 #Set vehicle start speed between 5 and 15 m/s
 for vehicle in env.unwrapped.road.vehicles:
+    print("INITIAL\nVehicle: {}, Initial Speed: {}, Min Speed: {}, Max Speed: {}".format(vehicle, vehicle.speed, vehicle.MIN_SPEED, vehicle.MAX_SPEED))
     vehicle.speed = np.random.randint(config.initial_min_speed, config.initial_max_speed)
-    print("Vehicle: {}, Initial Speed: {}".format(vehicle, vehicle.speed))
+    vehicle.MIN_SPEED = config.min_speed
+    vehicle.MAX_SPEED = config.max_speed
+    print("UPDATED\nVehicle: {}, Initial Speed: {}, Min Speed: {}, Max Speed: {}".format(vehicle, vehicle.speed, vehicle.MIN_SPEED, vehicle.MAX_SPEED))
 
 env.reset()
 

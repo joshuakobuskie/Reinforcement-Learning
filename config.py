@@ -37,6 +37,8 @@ action_type = "DiscreteMetaAction"
 
 
 # The speed range for each vehicle is limited to 5-15 m/s.
+min_speed = 5
+max_speed = 15
 
 #defaults from the highway env
 action = {'type': 'DiscreteMetaAction'}
