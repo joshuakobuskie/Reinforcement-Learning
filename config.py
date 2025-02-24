@@ -1,5 +1,5 @@
 import highway_env
-time_steps = 100
+max_iters = 100
 
 #Paper configurations
 #IDMVehcile uses the IDM for longitudinal movement and MOBIL for lateral movement
@@ -7,8 +7,16 @@ vehicles_type = highway_env.vehicle.behavior.IDMVehicle
 initial_min_speed = 5
 initial_max_speed = 15
 
-#Include agent vehicle
-vehicles_count = 4
+#Includes agent vehicle
+#Not what we needed, this limits vehicles not observations
+#vehicles_count = 4
+
+#Set observation limit to 3 vehicles
+observation_type =  "Kinematics"
+observation_vehicles_count = 3
+
+#Maximum distance of simulation
+max_distance = 370
 
 #defaults from the highway env
 action = {'type': 'DiscreteMetaAction'}
