@@ -15,6 +15,9 @@ initial_max_speed = 15
 observation_type =  "Kinematics"
 observation_vehicles_count = 3
 
+#View only longitudinal coordinate, lateral coordinate, longitudinal velocity, and lateral velocity
+observation_features = ["x", "y", "vx", "vy"]
+
 #Maximum distance of simulation
 max_distance = 370
 

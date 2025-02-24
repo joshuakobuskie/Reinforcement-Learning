@@ -8,7 +8,7 @@ import numpy as np
 def euclidian_distance(pos_1, pos_2):
     return np.linalg.norm(np.array(pos_2) - np.array(pos_1))
 
-env = gymnasium.make('merge-v0', render_mode='rgb_array', config={"other_vehicles_type": config.other_vehicles_type, "observation": {"type": config.observation_type, "vehicles_count": config.observation_vehicles_count}})
+env = gymnasium.make('merge-v0', render_mode='rgb_array', config={"other_vehicles_type": config.other_vehicles_type, "observation": {"type": config.observation_type, "vehicles_count": config.observation_vehicles_count, "features": config.observation_features}})
  
 #Change environment after configuring if needed
 #Example
@@ -31,6 +31,8 @@ while not done and iters < config.max_iters:
     action = env.unwrapped.action_type.actions_indexes["IDLE"]
     obs, reward, done, truncated, info = env.step(action)
     env.render()
+    #Confirmed working as intended: 3 objects with only x,y,vx,vy
+    #print(obs)
     iters += 1
 
 pprint.pprint(env.unwrapped.config)
