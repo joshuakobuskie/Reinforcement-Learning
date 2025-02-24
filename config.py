@@ -8,7 +8,7 @@ initial_max_speed = 15
 
 #HDV were implemented using Intelligent Driver Model (IDM) [9] and Minimizing Overall Braking Induced by Lane change (MOBIL)
 #IDMVehcile uses the IDM for longitudinal movement and MOBIL for lateral movement
-vehicles_type = highway_env.vehicle.behavior.IDMVehicle
+vehicles_type = "highway_env.vehicle.behavior.IDMVehicle"
 
 #Receives observations of up to three obstacles or vehicles in its vicinity
 #Set observation limit to 3 vehicles
