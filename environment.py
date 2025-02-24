@@ -11,15 +11,9 @@ def euclidian_distance(pos_1, pos_2):
 env = gymnasium.make('merge-v0', render_mode='rgb_array', config={"other_vehicles_type": config.other_vehicles_type, 
                                                                   "observation": {"type": config.observation_type, "vehicles_count": config.observation_vehicles_count, "features": config.observation_features},
                                                                   "action": {"type": config.action_type}})
- 
-#Change environment after configuring if needed
-#Example
-#env.unwrapped.config["lanes_count"] = 2
-#Must reset to ensure changes are made
-
-#pprint.pprint(env.unwrapped)
 
 #Set vehicle start speed between 5 and 15 m/s
+#Set min of 5 and max of 15 m/s
 for vehicle in env.unwrapped.road.vehicles:
     print("INITIAL\nVehicle: {}, Initial Speed: {}, Min Speed: {}, Max Speed: {}".format(vehicle, vehicle.speed, vehicle.MIN_SPEED, vehicle.MAX_SPEED))
     vehicle.speed = np.random.randint(config.initial_min_speed, config.initial_max_speed)
@@ -29,13 +23,11 @@ for vehicle in env.unwrapped.road.vehicles:
 
 env.reset()
 
-#Replaced with distance
-#iters = 0
-
-#Save start
+#Save start position
 start_pos = np.copy(env.unwrapped.vehicle.position)
 done = False
-#Changed to stop on crash
+
+#Stop on crash or distance greater than 370
 while not done and euclidian_distance(start_pos, env.unwrapped.vehicle.position) < config.max_distance:
     print(euclidian_distance(start_pos, env.unwrapped.vehicle.position))
     action = env.unwrapped.action_type.actions_indexes["IDLE"]
@@ -43,7 +35,5 @@ while not done and euclidian_distance(start_pos, env.unwrapped.vehicle.position)
     env.render()
     #Confirmed working as intended: 3 objects with only x,y,vx,vy
     print(obs)
-    #iters += 1
-
 
 pprint.pprint(env.unwrapped.config)
