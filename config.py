@@ -1,4 +1,11 @@
+import highway_env
 time_steps = 100
+
+#Paper configurations
+#IDMVehcile uses the IDM for longitudinal movement and MOBIL for lateral movement
+vehicles_type = highway_env.vehicle.behavior.IDMVehicle
+initial_min_speed = 5
+initial_max_speed = 15
 
 #defaults from the highway env
 action = {'type': 'DiscreteMetaAction'}
