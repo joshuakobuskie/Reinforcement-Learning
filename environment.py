@@ -9,7 +9,7 @@ def euclidian_distance(pos_1, pos_2):
     return np.linalg.norm(np.array(pos_1) - np.array(pos_2))
 
 #Cannot reduce lane count to match graphics
-env = gymnasium.make('merge-v0', render_mode='rgb_array', config={"other_vehicles_type": config.vehicles_type,
+env = gymnasium.make('merge-v0', render_mode='rgb_array', config={"other_vehicles_type": config.other_vehicles_type,
                                                                   "observation": {"type": config.observation_type, "vehicles_count": config.observation_vehicles_count, "features": config.observation_features},
                                                                   "action": {"type": config.action_type}})
 
