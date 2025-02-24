@@ -24,6 +24,16 @@ observation_features = ["x", "y", "vx", "vy"]
 max_distance = 370
 
 #can perform five actions (Lane left, Idle, Lane right, faster, slower) through acceleration and steering control.
+action_type = "DiscreteMetaAction"
+
+#corresponding action space
+# ACTIONS_ALL = {
+#         0: 'LANE_LEFT',
+#         1: 'IDLE',
+#         2: 'LANE_RIGHT',
+#         3: 'FASTER',
+#         4: 'SLOWER'
+#     }
 
 
 # The speed range for each vehicle is limited to 5-15 m/s.
