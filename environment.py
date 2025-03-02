@@ -71,11 +71,11 @@ env = gymnasium.make("custom-merge-v0", render_mode="rgb_array", config={"other_
                                                                   "action": {"type": config.action_type}})
 
 #Create model
-policy_kwargs = dict(net_arch=[64, 64], activation_fn=nn.ReLU)
+# policy_kwargs = dict(net_arch=[64, 64], activation_fn=nn.ReLU)
 
-model = DQN("MlpPolicy", env, policy_kwargs=policy_kwargs, learning_rate=config.learning_rate, buffer_size=config.buffer_size, learning_starts=config.learning_starts, batch_size=config.batch_size, gamma=config.gamma, train_freq=config.train_frequency, exploration_fraction=config.exploration_fraction, target_update_interval=config.target_update_interval)
-model.learn(total_timesteps=config.total_timesteps)
-model.save("DQN_Merge_Model")
+# model = DQN("MlpPolicy", env, policy_kwargs=policy_kwargs, learning_rate=config.learning_rate, buffer_size=config.buffer_size, learning_starts=config.learning_starts, batch_size=config.batch_size, gamma=config.gamma, train_freq=config.train_frequency, exploration_fraction=config.exploration_fraction, target_update_interval=config.target_update_interval)
+# model.learn(total_timesteps=config.total_timesteps)
+# model.save("DQN_Merge_Model")
 
 model = DQN.load("DQN_Merge_Model", env=env)
 
