@@ -32,7 +32,7 @@ class CustomMergeEnv(MergeEnv):
             reward -= 10.0
             
         # 2. Reward forward progress (distance from starting position)
-        progress = euclidian_distance(start_pos, self.vehicle.position)
+        progress = euclidian_distance(self.initial_position, self.vehicle.position)
         reward += progress * 0.1
         
         # 3. Reward high speed
@@ -43,6 +43,12 @@ class CustomMergeEnv(MergeEnv):
             reward -= 0.1
             
         return reward
+    
+    #Dont lose the initial position
+    def reset(self, *args, **kwargs):
+        obs = super().reset(*args, **kwargs)
+        self.initial_position = np.copy(self.vehicle.position)
+        return obs
 
 # Register the custom environment
 gymnasium.register(id="custom-merge-v0", entry_point="__main__:CustomMergeEnv")
