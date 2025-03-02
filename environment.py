@@ -1,7 +1,6 @@
 import gymnasium
 import highway_env
 from matplotlib import pyplot as plt
-import pprint
 import config
 import numpy as np
 from highway_env.envs.merge_env import MergeEnv
@@ -48,6 +47,21 @@ class CustomMergeEnv(MergeEnv):
                         reward += config.w4 * (-1/distance)
 
         return reward
+    
+    #Need to add 370 meter stopping constraint into the env
+    def step(self, action):
+        obs, reward, done, truncated, info = super().step(action)
+        if euclidian_distance(self.start_pos, self.vehicle.position) >= config.max_distance:
+            done = True
+        return obs, reward, done, truncated, info
+    
+    def reset(self, **kwargs):
+        obs, info = super().reset(**kwargs)
+    
+        #Initialize start position at the beginning of each episode
+        self.start_pos = np.copy(self.vehicle.position)
+
+        return obs, info
 
 # Register the custom environment
 gymnasium.register(id="custom-merge-v0", entry_point="__main__:CustomMergeEnv")
@@ -56,25 +70,19 @@ env = gymnasium.make("custom-merge-v0", render_mode="rgb_array", config={"other_
                                                                   "observation": {"type": config.observation_type, "vehicles_count": config.observation_vehicles_count, "features": config.observation_features},
                                                                   "action": {"type": config.action_type}})
 
-env.reset()
-
 #Create model
 policy_kwargs = dict(net_arch=[64, 64], activation_fn=nn.ReLU)
 
 model = DQN("MlpPolicy", env, policy_kwargs=policy_kwargs, learning_rate=config.learning_rate, buffer_size=config.buffer_size, learning_starts=config.learning_starts, batch_size=config.batch_size, gamma=config.gamma, train_freq=config.train_frequency, exploration_fraction=config.exploration_fraction, target_update_interval=config.target_update_interval)
+model.learn(total_timesteps=config.total_timesteps)
+model.save("DQN_Merge_Model")
 
+model = DQN.load("DQN_Merge_Model", env=env)
 
-#Save start position
-start_pos = np.copy(env.unwrapped.vehicle.position)
+obs, info = env.reset()
 done = False
 
-#Stop on crash or distance greater than 370
-while not done and euclidian_distance(start_pos, env.unwrapped.vehicle.position) < config.max_distance:
-    print(euclidian_distance(start_pos, env.unwrapped.vehicle.position))
-    action = env.unwrapped.action_type.actions_indexes["IDLE"]
+while not done:
+    action, next_state = model.predict(obs, deterministic=True)
     obs, reward, done, truncated, info = env.step(action)
     env.render()
-    #Confirmed working as intended: 3 objects with only x,y,vx,vy
-    print(obs)
-
-pprint.pprint(env.unwrapped.config)
