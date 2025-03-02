@@ -5,10 +5,11 @@ import pprint
 import config
 import numpy as np
 from highway_env.envs.merge_env import MergeEnv
+from stable_baselines3 import DQN
+import torch.nn as nn
 
 def euclidian_distance(pos_1, pos_2):
     return np.linalg.norm(np.array(pos_1) - np.array(pos_2))
-
 
 # Custom environment with modified reward function
 class CustomMergeEnv(MergeEnv):
@@ -51,21 +52,17 @@ class CustomMergeEnv(MergeEnv):
 # Register the custom environment
 gymnasium.register(id="custom-merge-v0", entry_point="__main__:CustomMergeEnv")
 
-#Cannot reduce lane count to match graphics
 env = gymnasium.make("custom-merge-v0", render_mode="rgb_array", config={"other_vehicles_type": config.other_vehicles_type,
                                                                   "observation": {"type": config.observation_type, "vehicles_count": config.observation_vehicles_count, "features": config.observation_features},
                                                                   "action": {"type": config.action_type}})
 
-#Set vehicle start speed between 5 and 15 m/s
-#Set min of 5 and max of 15 m/s
-# for vehicle in env.unwrapped.road.vehicles:
-#     print("INITIAL\nVehicle: {}, Initial Speed: {}, Min Speed: {}, Max Speed: {}".format(vehicle, vehicle.speed, vehicle.MIN_SPEED, vehicle.MAX_SPEED))
-    # vehicle.speed = np.random.randint(config.initial_min_speed, config.initial_max_speed)
-    # vehicle.MIN_SPEED = config.min_speed
-    # vehicle.MAX_SPEED = config.max_speed
-    # print("UPDATED\nVehicle: {}, Initial Speed: {}, Min Speed: {}, Max Speed: {}".format(vehicle, vehicle.speed, vehicle.MIN_SPEED, vehicle.MAX_SPEED))
-
 env.reset()
+
+#Create model
+policy_kwargs = dict(net_arch=[64, 64], activation_fn=nn.ReLU)
+
+model = DQN("MlpPolicy", env, policy_kwargs=policy_kwargs, learning_rate=config.learning_rate, buffer_size=config.buffer_size, learning_starts=config.learning_starts, batch_size=config.batch_size, gamma=config.gamma, train_freq=config.train_frequency, exploration_fraction=config.exploration_fraction, target_update_interval=config.target_update_interval)
+
 
 #Save start position
 start_pos = np.copy(env.unwrapped.vehicle.position)

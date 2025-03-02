@@ -46,6 +46,16 @@ w2 = 1.0
 w3 = 20.0
 w4 = 5.0
 
+#Hyperparameters
+learning_rate = 0.005
+buffer_size  =15000
+learning_starts = 200
+batch_size = 32
+gamma = 0.8
+train_frequency = 1
+exploration_fraction = 0.01
+target_update_interval = 50
+
 #defaults from the highway env
 # action = {'type': 'DiscreteMetaAction'}
 # centering_position = [0.3, 0.5]
