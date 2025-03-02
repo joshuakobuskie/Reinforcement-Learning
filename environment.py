@@ -12,6 +12,16 @@ def euclidian_distance(pos_1, pos_2):
 
 # Custom environment with modified reward function
 class CustomMergeEnv(MergeEnv):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+            
+        #Set vehicle start speed between 5 and 15 m/s
+        #Set min of 5 and max of 15 m/s 
+        for vehicle in self.road.vehicles:
+            vehicle.speed = np.random.randint(config.initial_min_speed, config.initial_max_speed)
+            vehicle.MIN_SPEED = config.min_speed
+            vehicle.MAX_SPEED = config.max_speed
+
     def _reward(self, action):
         """Define your custom reward function here"""
         # Example custom reward components:
@@ -44,12 +54,12 @@ env = gymnasium.make("custom-merge-v0", render_mode="rgb_array", config={"other_
 
 #Set vehicle start speed between 5 and 15 m/s
 #Set min of 5 and max of 15 m/s
-for vehicle in env.unwrapped.road.vehicles:
-    print("INITIAL\nVehicle: {}, Initial Speed: {}, Min Speed: {}, Max Speed: {}".format(vehicle, vehicle.speed, vehicle.MIN_SPEED, vehicle.MAX_SPEED))
-    vehicle.speed = np.random.randint(config.initial_min_speed, config.initial_max_speed)
-    vehicle.MIN_SPEED = config.min_speed
-    vehicle.MAX_SPEED = config.max_speed
-    print("UPDATED\nVehicle: {}, Initial Speed: {}, Min Speed: {}, Max Speed: {}".format(vehicle, vehicle.speed, vehicle.MIN_SPEED, vehicle.MAX_SPEED))
+# for vehicle in env.unwrapped.road.vehicles:
+#     print("INITIAL\nVehicle: {}, Initial Speed: {}, Min Speed: {}, Max Speed: {}".format(vehicle, vehicle.speed, vehicle.MIN_SPEED, vehicle.MAX_SPEED))
+    # vehicle.speed = np.random.randint(config.initial_min_speed, config.initial_max_speed)
+    # vehicle.MIN_SPEED = config.min_speed
+    # vehicle.MAX_SPEED = config.max_speed
+    # print("UPDATED\nVehicle: {}, Initial Speed: {}, Min Speed: {}, Max Speed: {}".format(vehicle, vehicle.speed, vehicle.MIN_SPEED, vehicle.MAX_SPEED))
 
 env.reset()
 
