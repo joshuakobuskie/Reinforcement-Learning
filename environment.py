@@ -4,12 +4,41 @@ from matplotlib import pyplot as plt
 import pprint
 import config
 import numpy as np
+from highway_env.envs.merge_env import MergeEnv
 
 def euclidian_distance(pos_1, pos_2):
     return np.linalg.norm(np.array(pos_1) - np.array(pos_2))
 
+
+# Custom environment with modified reward function
+class CustomMergeEnv(MergeEnv):
+    def _reward(self, action):
+        """Define your custom reward function here"""
+        # Example custom reward components:
+        reward = 0.0
+        
+        # 1. Penalize collisions heavily
+        if self.vehicle.crashed:
+            reward -= 10.0
+            
+        # 2. Reward forward progress (distance from starting position)
+        progress = euclidian_distance(start_pos, self.vehicle.position)
+        reward += progress * 0.1
+        
+        # 3. Reward high speed
+        reward += self.vehicle.speed * 0.2
+        
+        # 4. Penalize lane changes (if using discrete actions)
+        if action == 0 or action == 2:  # Assuming these are lane change actions
+            reward -= 0.1
+            
+        return reward
+
+# Register the custom environment
+gymnasium.register(id="custom-merge-v0", entry_point="__main__:CustomMergeEnv")
+
 #Cannot reduce lane count to match graphics
-env = gymnasium.make('merge-v0', render_mode='rgb_array', config={"other_vehicles_type": config.other_vehicles_type,
+env = gymnasium.make("custom-merge-v0", render_mode="rgb_array", config={"other_vehicles_type": config.other_vehicles_type,
                                                                   "observation": {"type": config.observation_type, "vehicles_count": config.observation_vehicles_count, "features": config.observation_features},
                                                                   "action": {"type": config.action_type}})
 
