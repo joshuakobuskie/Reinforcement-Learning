@@ -23,32 +23,30 @@ class CustomMergeEnv(MergeEnv):
             vehicle.MAX_SPEED = config.max_speed
 
     def _reward(self, action):
-        """Define your custom reward function here"""
-        # Example custom reward components:
+
         reward = 0.0
         
-        # 1. Penalize collisions heavily
+        #Collisions
         if self.vehicle.crashed:
-            reward -= 10.0
-            
-        # 2. Reward forward progress (distance from starting position)
-        progress = euclidian_distance(self.initial_position, self.vehicle.position)
-        reward += progress * 0.1
-        
-        # 3. Reward high speed
-        reward += self.vehicle.speed * 0.2
-        
-        # 4. Penalize lane changes (if using discrete actions)
-        if action == 0 or action == 2:  # Assuming these are lane change actions
-            reward -= 0.1
-            
+            reward += config.w1 * -1
+
+        #Speed
+        reward += config.w2 * ((self.vehicle.MAX_SPEED - np.sqrt((self.vehicle.speed - self.vehicle.MAX_SPEED)**2))/self.vehicle.MAX_SPEED)
+
+        #Rear/Lateral        
+        for vehicle in self.road.vehicles:
+            if vehicle != self.vehicle:
+                distance = euclidian_distance(self.vehicle.position, vehicle.position)
+                #Lateral
+                if vehicle.lane != self.vehicle.lane:
+                    if distance < config.safety_distance:
+                        reward += config.w3 * (-1/distance)
+                #Rear
+                else:
+                    if distance < config.safety_distance:
+                        reward += config.w4 * (-1/distance)
+
         return reward
-    
-    #Dont lose the initial position
-    def reset(self, *args, **kwargs):
-        obs = super().reset(*args, **kwargs)
-        self.initial_position = np.copy(self.vehicle.position)
-        return obs
 
 # Register the custom environment
 gymnasium.register(id="custom-merge-v0", entry_point="__main__:CustomMergeEnv")

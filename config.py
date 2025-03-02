@@ -39,6 +39,13 @@ action_type = "DiscreteMetaAction"
 min_speed = 5
 max_speed = 15
 
+#Reward function
+safety_distance = 10
+w1 = 50.0
+w2 = 1.0
+w3 = 20.0
+w4 = 5.0
+
 #defaults from the highway env
 # action = {'type': 'DiscreteMetaAction'}
 # centering_position = [0.3, 0.5]
