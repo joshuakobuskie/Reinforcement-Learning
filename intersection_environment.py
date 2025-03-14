@@ -3,7 +3,7 @@ import highway_env
 from matplotlib import pyplot as plt
 import config
 import numpy as np
-from highway_env.envs.merge_env import MergeEnv
+from highway_env.envs.intersection_env import IntersectionEnv
 from stable_baselines3 import DQN
 import torch.nn as nn
 
@@ -11,7 +11,7 @@ def euclidian_distance(pos_1, pos_2):
     return np.linalg.norm(np.array(pos_1) - np.array(pos_2))
 
 # Custom environment with modified reward function
-class CustomMergeEnv(MergeEnv):
+class CustomIntersectionEnv(IntersectionEnv):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
             
@@ -64,9 +64,9 @@ class CustomMergeEnv(MergeEnv):
         return obs, info
 
 # Register the custom environment
-gymnasium.register(id="custom-merge-v0", entry_point="__main__:CustomMergeEnv")
+gymnasium.register(id="custom-intersection-v0", entry_point="__main__:CustomIntersectionEnv")
 
-env = gymnasium.make("custom-merge-v0", render_mode="rgb_array", config={"other_vehicles_type": config.other_vehicles_type,
+env = gymnasium.make("custom-intersection-v0", render_mode="rgb_array", config={"other_vehicles_type": config.other_vehicles_type,
                                                                   "observation": {"type": config.observation_type, "vehicles_count": config.observation_vehicles_count, "features": config.observation_features},
                                                                   "action": {"type": config.action_type}})
 
@@ -78,10 +78,10 @@ env = gymnasium.make("custom-merge-v0", render_mode="rgb_array", config={"other_
 
 # model = DQN("MlpPolicy", env, policy_kwargs=policy_kwargs, learning_rate=config.learning_rate, buffer_size=config.buffer_size, learning_starts=config.learning_starts, batch_size=config.batch_size, gamma=config.gamma, train_freq=config.train_frequency, exploration_fraction=config.exploration_fraction, target_update_interval=config.target_update_interval)
 # model.learn(total_timesteps=config.total_timesteps)
-# model.save("DQN_Merge_Model")
+# model.save("DQN_Intersection_Model")
 ########################################
 
-model = DQN.load("DQN_Merge_Model", env=env)
+model = DQN.load("DQN_Intersection_Model", env=env)
 
 obs, info = env.reset()
 done = False
