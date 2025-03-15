@@ -3,7 +3,7 @@ import highway_env
 from matplotlib import pyplot as plt
 import config
 import numpy as np
-from highway_env.envs.highway_env import HighwayEnvFast
+from highway_env.envs.highway_env import HighwayEnv
 from stable_baselines3 import DQN
 import torch.nn as nn
 
@@ -11,7 +11,7 @@ def euclidian_distance(pos_1, pos_2):
     return np.linalg.norm(np.array(pos_1) - np.array(pos_2))
 
 # Custom environment with modified reward function
-class CustomFastHighwayEnv(HighwayEnvFast):
+class CustomHighwayEnv(HighwayEnv):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
             
@@ -64,22 +64,22 @@ class CustomFastHighwayEnv(HighwayEnvFast):
         return obs, info
 
 # Register the custom environment
-gymnasium.register(id="custom-fast-highway-v0", entry_point="__main__:CustomFastHighwayEnv")
+gymnasium.register(id="custom-highway-v0", entry_point="__main__:CustomHighwayEnv")
 
-env = gymnasium.make("custom-fast-highway-v0", render_mode="rgb_array", config={"other_vehicles_type": config.other_vehicles_type,
+env = gymnasium.make("custom-highway-v0", render_mode="rgb_array", config={"other_vehicles_type": config.other_vehicles_type,
                                                                   "observation": {"type": config.observation_type, "vehicles_count": config.observation_vehicles_count, "features": config.observation_features},
                                                                   "action": {"type": config.action_type}})
 
 #Create model
 
-########################################
-# #Uncomment when training a new model
-# policy_kwargs = dict(net_arch=[64, 64], activation_fn=nn.ReLU)
+#######################################
+#Uncomment when training a new model
+policy_kwargs = dict(net_arch=[64, 64], activation_fn=nn.ReLU)
 
-# model = DQN("MlpPolicy", env, policy_kwargs=policy_kwargs, learning_rate=config.learning_rate, buffer_size=config.buffer_size, learning_starts=config.learning_starts, batch_size=config.batch_size, gamma=config.gamma, train_freq=config.train_frequency, exploration_fraction=config.exploration_fraction, target_update_interval=config.target_update_interval)
-# model.learn(total_timesteps=config.total_timesteps)
-# model.save("DQN_Highway_Model")
-########################################
+model = DQN("MlpPolicy", env, policy_kwargs=policy_kwargs, learning_rate=config.learning_rate, buffer_size=config.buffer_size, learning_starts=config.learning_starts, batch_size=config.batch_size, gamma=config.gamma, train_freq=config.train_frequency, exploration_fraction=config.exploration_fraction, target_update_interval=config.target_update_interval)
+model.learn(total_timesteps=config.total_timesteps, progress_bar=True)
+model.save("DQN_Highway_Model")
+#######################################
 
 model = DQN.load("DQN_Highway_Model", env=env)
 
