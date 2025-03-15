@@ -48,7 +48,7 @@ w4 = 5.0
 
 #Hyperparameters
 learning_rate = 0.005
-buffer_size  =15000
+buffer_size  = 15000
 learning_starts = 200
 batch_size = 32
 gamma = 0.8
