@@ -66,7 +66,7 @@ class CustomHighwayEnv(HighwayEnv):
 # Register the custom environment
 gymnasium.register(id="custom-highway-v0", entry_point="__main__:CustomHighwayEnv")
 
-env = gymnasium.make("custom-highway-v0", render_mode="rgb_array", config_highway={"other_vehicles_type": config_highway.other_vehicles_type,
+env = gymnasium.make("custom-highway-v0", render_mode="rgb_array", config={"other_vehicles_type": config_highway.other_vehicles_type,
                                                                   "observation": {"type": config_highway.observation_type, "vehicles_count": config_highway.observation_vehicles_count, "features": config_highway.observation_features},
                                                                   "action": {"type": config_highway.action_type}})
 

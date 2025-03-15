@@ -66,7 +66,7 @@ class CustomIntersectionEnv(IntersectionEnv):
 # Register the custom environment
 gymnasium.register(id="custom-intersection-v0", entry_point="__main__:CustomIntersectionEnv")
 
-env = gymnasium.make("custom-intersection-v0", render_mode="rgb_array", config_intersection={"other_vehicles_type": config_intersection.other_vehicles_type,
+env = gymnasium.make("custom-intersection-v0", render_mode="rgb_array", config={"other_vehicles_type": config_intersection.other_vehicles_type,
                                                                   "observation": {"type": config_intersection.observation_type, "vehicles_count": config_intersection.observation_vehicles_count, "features": config_intersection.observation_features},
                                                                   "action": {"type": config_intersection.action_type}})
 

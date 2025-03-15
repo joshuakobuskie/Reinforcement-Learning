@@ -66,7 +66,7 @@ class CustomMergeEnv(MergeEnv):
 # Register the custom environment
 gymnasium.register(id="custom-merge-v0", entry_point="__main__:CustomMergeEnv")
 
-env = gymnasium.make("custom-merge-v0", render_mode="rgb_array", config_merge={"other_vehicles_type": config_merge.other_vehicles_type,
+env = gymnasium.make("custom-merge-v0", render_mode="rgb_array", config={"other_vehicles_type": config_merge.other_vehicles_type,
                                                                   "observation": {"type": config_merge.observation_type, "vehicles_count": config_merge.observation_vehicles_count, "features": config_merge.observation_features},
                                                                   "action": {"type": config_merge.action_type}})
 

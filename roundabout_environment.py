@@ -66,7 +66,7 @@ class CustomRoundaboutEnv(RoundaboutEnv):
 # Register the custom environment
 gymnasium.register(id="custom-roundabout-v0", entry_point="__main__:CustomRoundaboutEnv")
 
-env = gymnasium.make("custom-roundabout-v0", render_mode="rgb_array", config_roundabout={"other_vehicles_type": config_roundabout.other_vehicles_type,
+env = gymnasium.make("custom-roundabout-v0", render_mode="rgb_array", config={"other_vehicles_type": config_roundabout.other_vehicles_type,
                                                                   "observation": {"type": config_roundabout.observation_type, "vehicles_count": config_roundabout.observation_vehicles_count, "features": config_roundabout.observation_features},
                                                                   "action": {"type": config_roundabout.action_type}})
 
