@@ -72,14 +72,14 @@ env = gymnasium.make("custom-highway-v0", render_mode="rgb_array", config={"othe
 
 #Create model
 
-#######################################
-#Uncomment when training a new model
-policy_kwargs = dict(net_arch=[64, 64], activation_fn=nn.ReLU)
+# #######################################
+# #Uncomment when training a new model
+# policy_kwargs = dict(net_arch=[64, 64], activation_fn=nn.ReLU)
 
-model = DQN("MlpPolicy", env, policy_kwargs=policy_kwargs, learning_rate=config_highway.learning_rate, buffer_size=config_highway.buffer_size, learning_starts=config_highway.learning_starts, batch_size=config_highway.batch_size, gamma=config_highway.gamma, train_freq=config_highway.train_frequency, exploration_fraction=config_highway.exploration_fraction, target_update_interval=config_highway.target_update_interval)
-model.learn(total_timesteps=config_highway.total_timesteps, progress_bar=True)
-model.save("DQN_Highway_Model")
-#######################################
+# model = DQN("MlpPolicy", env, policy_kwargs=policy_kwargs, learning_rate=config_highway.learning_rate, buffer_size=config_highway.buffer_size, learning_starts=config_highway.learning_starts, batch_size=config_highway.batch_size, gamma=config_highway.gamma, train_freq=config_highway.train_frequency, exploration_fraction=config_highway.exploration_fraction, target_update_interval=config_highway.target_update_interval)
+# model.learn(total_timesteps=config_highway.total_timesteps, progress_bar=True)
+# model.save("DQN_Highway_Model")
+# #######################################
 
 model = DQN.load("DQN_Highway_Model", env=env)
 
