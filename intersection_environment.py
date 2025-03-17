@@ -74,11 +74,11 @@ env = gymnasium.make("custom-intersection-v0", render_mode="rgb_array", config={
 
 # #######################################
 # #Uncomment when training a new model
-# policy_kwargs = dict(net_arch=[64, 64], activation_fn=nn.ReLU)
+policy_kwargs = dict(net_arch=[64, 64], activation_fn=nn.ReLU)
 
-# model = DQN("MlpPolicy", env, policy_kwargs=policy_kwargs, learning_rate=config_intersection.learning_rate, buffer_size=config_intersection.buffer_size, learning_starts=config_intersection.learning_starts, batch_size=config_intersection.batch_size, gamma=config_intersection.gamma, train_freq=config_intersection.train_frequency, exploration_fraction=config_intersection.exploration_fraction, target_update_interval=config_intersection.target_update_interval)
-# model.learn(total_timesteps=config_intersection.total_timesteps, progress_bar=True)
-# model.save("DQN_Intersection_Model")
+model = DQN("MlpPolicy", env, policy_kwargs=policy_kwargs, learning_rate=config_intersection.learning_rate, buffer_size=config_intersection.buffer_size, learning_starts=config_intersection.learning_starts, batch_size=config_intersection.batch_size, gamma=config_intersection.gamma, train_freq=config_intersection.train_frequency, exploration_fraction=config_intersection.exploration_fraction, target_update_interval=config_intersection.target_update_interval)
+model.learn(total_timesteps=config_intersection.total_timesteps, progress_bar=True)
+model.save("DQN_Intersection_Model_Adjusted_Rear_to_3")
 # #######################################
 
 model = DQN.load("DQN_Intersection_Model", env=env)
