@@ -41,7 +41,7 @@ max_speed = 15
 
 #Reward function
 safety_distance = 10
-w1 = 50.0
+w1 = 40.0
 w2 = 1.0
 w3 = 20.0
 w4 = 5.0
