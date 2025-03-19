@@ -43,19 +43,19 @@ max_speed = 15
 safety_distance = 10
 w1 = 50.0
 w2 = 1.0
-w3 = 20.0
+w3 = 10.0
 w4 = 5.0
 
 #Hyperparameters
-learning_rate = 0.00005
+learning_rate = 0.0005
 buffer_size  = 50000
 learning_starts = 1000
-batch_size = 64
-gamma = 0.99
+batch_size = 128
+gamma = 0.95
 train_frequency = 4
 exploration_fraction = 0.1
 target_update_interval = 5000
-total_timesteps = 50000
+total_timesteps = 35000
 
 #defaults from the highway env
 # action = {'type': 'DiscreteMetaAction'}

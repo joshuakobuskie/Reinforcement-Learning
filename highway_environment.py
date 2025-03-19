@@ -5,7 +5,7 @@ import config_highway
 import numpy as np
 from highway_env.envs.highway_env import HighwayEnv
 from stable_baselines3 import DQN
-import toch
+import torch
 import torch.nn as nn
 
 def euclidian_distance(pos_1, pos_2):
@@ -90,13 +90,14 @@ batch_size=config_highway.batch_size,
 gamma=config_highway.gamma, 
 train_freq=config_highway.train_frequency, 
 exploration_fraction=config_highway.exploration_fraction, 
-target_update_interval=config_highway.target_update_interval
+target_update_interval=config_highway.target_update_interval,
+tensorboard_log="./DQN_Highway_Model_Eval_tensorboard/"
 )
 model.learn(total_timesteps=config_highway.total_timesteps, progress_bar=True)
-model.save("DQN_Highway_Model")
+model.save("DQN_Highway_Model_Eval")
 # #######################################
 
-model = DQN.load("DQN_Highway_Model", env=env)
+model = DQN.load("DQN_Highway_Model_Eval", env=env)
 
 obs, info = env.reset()
 done = False

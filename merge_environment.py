@@ -78,14 +78,25 @@ env = gymnasium.make("custom-merge-v0", render_mode="rgb_array", config={"other_
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print("Using device:", device)  # Check if GPU is available
 # #Uncomment when training a new model
-# policy_kwargs = dict(net_arch=[64, 64], activation_fn=nn.ReLU)
+policy_kwargs = dict(net_arch=[64, 64], activation_fn=nn.ReLU)
 
-# model = DQN("MlpPolicy", env, policy_kwargs=policy_kwargs, learning_rate=config_merge.learning_rate, buffer_size=config_merge.buffer_size, learning_starts=config_merge.learning_starts, batch_size=config_merge.batch_size, gamma=config_merge.gamma, train_freq=config_merge.train_frequency, exploration_fraction=config_merge.exploration_fraction, target_update_interval=config_merge.target_update_interval)
-# model.learn(total_timesteps=config_merge.total_timesteps, progress_bar=True)
-# model.save("DQN_Merge_Model")
+model = DQN("MlpPolicy", 
+    env, 
+    policy_kwargs=policy_kwargs, 
+    learning_rate=config_merge.learning_rate, 
+    buffer_size=config_merge.buffer_size, 
+    learning_starts=config_merge.learning_starts, 
+    batch_size=config_merge.batch_size, 
+    gamma=config_merge.gamma, 
+    train_freq=config_merge.train_frequency, 
+    exploration_fraction=config_merge.exploration_fraction, 
+    target_update_interval=config_merge.target_update_interval,
+    tensorboard_log="./DQN_Merge_Model_Eval_tensorboard")
+model.learn(total_timesteps=config_merge.total_timesteps, progress_bar=True)
+model.save("DQN_Merge_Model_Eval")
 ########################################
 
-model = DQN.load("DQN_Merge_Model", env=env)
+model = DQN.load("DQN_Merge_Model_Eval", env=env)
 
 obs, info = env.reset()
 done = False
