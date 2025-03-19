@@ -35,7 +35,7 @@ action_type = "DiscreteMetaAction"
 #     }
 
 
-# The speed range for each vehicle is limited to 5-15 m/s.
+# The speed range for each vehicle is limited to 5-15 m/s. (If good performance, then modify to 25 m/s)
 min_speed = 5
 max_speed = 15
 
@@ -44,19 +44,18 @@ safety_distance = 10
 w1 = 50.0
 w2 = 1.0
 w3 = 20.0
-w4 = 3.0
+w4 = 5.0
 
 #Hyperparameters
-learning_rate = 0.005
-buffer_size  = 15000
-learning_starts = 200
-batch_size = 32
-gamma = 0.8
-train_frequency = 1
-exploration_fraction = 0.01
-target_update_interval = 50
-
-total_timesteps = 35000
+learning_rate = 0.00005
+buffer_size  = 50000
+learning_starts = 1000
+batch_size = 64
+gamma = 0.99
+train_frequency = 4
+exploration_fraction = 0.1
+target_update_interval = 5000
+total_timesteps = 50000
 
 #defaults from the highway env
 # action = {'type': 'DiscreteMetaAction'}

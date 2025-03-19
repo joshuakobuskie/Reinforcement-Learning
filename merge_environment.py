@@ -5,6 +5,7 @@ import config_merge
 import numpy as np
 from highway_env.envs.merge_env import MergeEnv
 from stable_baselines3 import DQN
+import torch
 import torch.nn as nn
 
 def euclidian_distance(pos_1, pos_2):
@@ -73,6 +74,9 @@ env = gymnasium.make("custom-merge-v0", render_mode="rgb_array", config={"other_
 #Create model
 
 ########################################
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print("Using device:", device)  # Check if GPU is available
 # #Uncomment when training a new model
 # policy_kwargs = dict(net_arch=[64, 64], activation_fn=nn.ReLU)
 
