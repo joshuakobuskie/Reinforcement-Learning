@@ -4,6 +4,7 @@ from matplotlib import pyplot as plt
 import config_roundabout
 import numpy as np
 from highway_env.envs.roundabout_env import RoundaboutEnv
+import config_tensorboard
 from stable_baselines3 import DQN
 import torch.nn as nn
 
@@ -89,7 +90,10 @@ model = DQN("MlpPolicy",
     target_update_interval=config_roundabout.target_update_interval,
     tensorboard_log="./DQN_Roundabout_Adjust_Dist_Model_tensorboard",
     verbose=1)
-model.learn(total_timesteps=config_roundabout.total_timesteps, progress_bar=True)
+model.learn(
+    total_timesteps=config_roundabout.total_timesteps, 
+    progress_bar=True, 
+    callback=config_tensorboard.HParamCallback())
 model.save("DQN_Roundabout_Adjust_Dist_Model")
 # #######################################
 

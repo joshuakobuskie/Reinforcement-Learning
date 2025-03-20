@@ -5,6 +5,7 @@ import config_highway
 import numpy as np
 from highway_env.envs.highway_env import HighwayEnv
 from stable_baselines3 import DQN
+import config_tensorboard
 import torch
 import torch.nn as nn
 
@@ -93,7 +94,10 @@ exploration_fraction=config_highway.exploration_fraction,
 target_update_interval=config_highway.target_update_interval,
 tensorboard_log="./DQN_Highway_Model_Eval_tensorboard/"
 )
-model.learn(total_timesteps=config_highway.total_timesteps, progress_bar=True)
+model.learn(
+    total_timesteps=config_highway.total_timesteps,
+    progress_bar=True,
+    callback=config_tensorboard.HParamCallback())
 model.save("DQN_Highway_Model_Eval")
 # #######################################
 

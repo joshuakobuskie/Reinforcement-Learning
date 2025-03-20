@@ -5,6 +5,7 @@ import config_merge
 import numpy as np
 from highway_env.envs.merge_env import MergeEnv
 from stable_baselines3 import DQN
+import config_tensorboard
 import torch
 import torch.nn as nn
 
@@ -92,7 +93,10 @@ model = DQN("MlpPolicy",
     exploration_fraction=config_merge.exploration_fraction, 
     target_update_interval=config_merge.target_update_interval,
     tensorboard_log="./DQN_Merge_Model_Eval_tensorboard")
-model.learn(total_timesteps=config_merge.total_timesteps, progress_bar=True)
+model.learn(
+    total_timesteps=config_merge.total_timesteps,
+    progress_bar=True,
+    callback=config_tensorboard.HParamCallback())
 model.save("DQN_Merge_Model_Eval")
 ########################################
 

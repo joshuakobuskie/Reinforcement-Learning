@@ -5,6 +5,7 @@ import config_intersection
 import numpy as np
 from highway_env.envs.intersection_env import IntersectionEnv
 from stable_baselines3 import DQN
+import config_tensorboard
 import torch
 import torch.nn as nn
 
@@ -98,7 +99,10 @@ model = DQN(
     target_update_interval=config_intersection.target_update_interval,
     verbose=1)
 
-model.learn(total_timesteps=config_intersection.total_timesteps, progress_bar=True)
+model.learn(
+    total_timesteps=config_intersection.total_timesteps, 
+    progress_bar=True, 
+    callback=config_tensorboard.HParamCallback())
 model.save("DQN_Intersection_Model_Adjusted_Neuron")
 ######################################
 

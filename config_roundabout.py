@@ -43,7 +43,7 @@ max_speed = 15
 safety_distance = 10
 w1 = 50.0
 w2 = 1.0
-w3 = 10.0
+w3 = 15.0
 w4 = 5.0
 
 #Hyperparameters
