@@ -20,7 +20,7 @@ observation_features = ["x", "y", "vx", "vy"]
 
 #An episode would terminate if a collision occurred or the ego vehicle passed a distance of 370m
 #Maximum distance of simulation
-max_distance = 370
+max_distance = 220
 
 #can perform five actions (Lane left, Idle, Lane right, faster, slower) through acceleration and steering control.
 action_type = "DiscreteMetaAction"
@@ -43,20 +43,20 @@ max_speed = 15
 safety_distance = 10
 w1 = 50.0
 w2 = 1.0
-w3 = 20.0
+w3 = 10.0
 w4 = 5.0
 
 #Hyperparameters
-learning_rate = 0.005
-buffer_size  = 15000
-learning_starts = 200
-batch_size = 32
-gamma = 0.8
-train_frequency = 1
-exploration_fraction = 0.01
-target_update_interval = 50
+learning_rate = 0.0005
+buffer_size  = 50000
+learning_starts = 1000
+batch_size = 128
+gamma = 0.95
+train_frequency = 5
+exploration_fraction = 0.05
+target_update_interval = 5000
 
-total_timesteps = 35000
+total_timesteps = 45000
 
 #defaults from the highway env
 # action = {'type': 'DiscreteMetaAction'}
