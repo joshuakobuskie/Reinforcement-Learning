@@ -20,7 +20,7 @@ observation_features = ["x", "y", "vx", "vy"]
 
 #An episode would terminate if a collision occurred or the ego vehicle passed a distance of 370m
 #Maximum distance of simulation
-max_distance = 220
+max_distance = 210
 
 #can perform five actions (Lane left, Idle, Lane right, faster, slower) through acceleration and steering control.
 action_type = "DiscreteMetaAction"
@@ -41,9 +41,9 @@ max_speed = 15
 
 #Reward function
 safety_distance = 10
-w1 = 50.0
+w1 = 25.0
 w2 = 1.0
-w3 = 15.0
+w3 = 10.0
 w4 = 5.0
 
 #Hyperparameters

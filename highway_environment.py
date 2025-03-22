@@ -92,8 +92,8 @@ gamma=config_highway.gamma,
 train_freq=config_highway.train_frequency, 
 exploration_fraction=config_highway.exploration_fraction, 
 target_update_interval=config_highway.target_update_interval,
-tensorboard_log="./DQN_Highway_Model_Eval_tensorboard/"
-)
+tensorboard_log="./DQN_Highway_Model_Eval_tensorboard/",
+verbose=1)
 model.learn(
     total_timesteps=config_highway.total_timesteps,
     progress_bar=True,
