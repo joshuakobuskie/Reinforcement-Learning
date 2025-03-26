@@ -88,16 +88,16 @@ env = gymnasium.make("custom-roundabout-v0", render_mode="rgb_array", config={"o
 #     train_freq=config_roundabout.train_frequency, 
 #     exploration_fraction=config_roundabout.exploration_fraction, 
 #     target_update_interval=config_roundabout.target_update_interval,
-#     tensorboard_log="./DQN_Roundabout_Adjust_Dist_Model_tensorboard",
+#     tensorboard_log="./DQN_Roundabout_Model_Eval_tensorboard",
 #     verbose=1)
 # model.learn(
 #     total_timesteps=config_roundabout.total_timesteps, 
 #     progress_bar=True, 
 #     callback=config_tensorboard.HParamCallback())
-# model.save("DQN_Roundabout_Adjust_Dist_Model")
+# model.save("DQN_Roundabout_Model_Eval")
 # #######################################
 
-model = DQN.load("DQN_Roundabout_Adjust_Dist_Model", env=env)
+model = DQN.load("DQN_Roundabout_Model_Eval", env=env)
 
 obs, info = env.reset()
 done = False
