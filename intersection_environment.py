@@ -81,32 +81,32 @@ env = gymnasium.make("custom-intersection-v0",
 # #######################################
 # #Uncomment when training a new model
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print("Using device:", device)  # Check if GPU is available
-policy_kwargs = dict(net_arch=[128, 128], activation_fn=nn.ReLU)
-model = DQN(
-    "MlpPolicy",
-    env,
-    policy_kwargs=policy_kwargs,
-    learning_rate=config_intersection.learning_rate,
-    tensorboard_log="./DQN_Intersection_Model_Adjusted_Neuron_tensorboard/",
-    buffer_size=config_intersection.buffer_size,
-    learning_starts=config_intersection.learning_starts,
-    batch_size=config_intersection.batch_size,
-    gamma=config_intersection.gamma,
-    train_freq=config_intersection.train_frequency,
-    exploration_fraction=config_intersection.exploration_fraction,
-    target_update_interval=config_intersection.target_update_interval,
-    verbose=1)
+# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# print("Using device:", device)  # Check if GPU is available
+# policy_kwargs = dict(net_arch=[128, 128], activation_fn=nn.ReLU)
+# model = DQN(
+#     "MlpPolicy",
+#     env,
+#     policy_kwargs=policy_kwargs,
+#     learning_rate=config_intersection.learning_rate,
+#     tensorboard_log="./DQN_Intersection_Model_Eval_tensorboard/",
+#     buffer_size=config_intersection.buffer_size,
+#     learning_starts=config_intersection.learning_starts,
+#     batch_size=config_intersection.batch_size,
+#     gamma=config_intersection.gamma,
+#     train_freq=config_intersection.train_frequency,
+#     exploration_fraction=config_intersection.exploration_fraction,
+#     target_update_interval=config_intersection.target_update_interval,
+#     verbose=1)
 
-model.learn(
-    total_timesteps=config_intersection.total_timesteps, 
-    progress_bar=True, 
-    callback=config_tensorboard.HParamCallback())
-model.save("DQN_Intersection_Model_Adjusted_Neuron")
-######################################
+# model.learn(
+#     total_timesteps=config_intersection.total_timesteps, 
+#     progress_bar=True, 
+#     callback=config_tensorboard.HParamCallback())
+# model.save("DQN_Intersection_Model_Eval")
+# ######################################
 
-model = DQN.load("DQN_Intersection_Model_Adjusted_Neuron", env=env)
+model = DQN.load("DQN_Intersection_Model_Eval", env=env)
 
 obs, info = env.reset()
 done = False
