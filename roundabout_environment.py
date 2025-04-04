@@ -73,29 +73,29 @@ env = gymnasium.make("custom-roundabout-v0", render_mode="rgb_array", config={"o
 
 #Create model
 
-# #######################################
+#######################################
 # #Uncomment when training a new model
-# policy_kwargs = dict(net_arch=[128, 128], activation_fn=nn.ReLU)
+policy_kwargs = dict(net_arch=[128, 128], activation_fn=nn.GELU)
 
-# model = DQN("MlpPolicy", 
-#     env, 
-#     policy_kwargs=policy_kwargs, 
-#     learning_rate=config_roundabout.learning_rate, 
-#     buffer_size=config_roundabout.buffer_size, 
-#     learning_starts=config_roundabout.learning_starts, 
-#     batch_size=config_roundabout.batch_size, 
-#     gamma=config_roundabout.gamma, 
-#     train_freq=config_roundabout.train_frequency, 
-#     exploration_fraction=config_roundabout.exploration_fraction, 
-#     target_update_interval=config_roundabout.target_update_interval,
-#     tensorboard_log="./DQN_Roundabout_Model_Eval_tensorboard",
-#     verbose=1)
-# model.learn(
-#     total_timesteps=config_roundabout.total_timesteps, 
-#     progress_bar=True, 
-#     callback=config_tensorboard.HParamCallback())
-# model.save("DQN_Roundabout_Model_Eval")
-# #######################################
+model = DQN("MlpPolicy", 
+    env, 
+    policy_kwargs=policy_kwargs, 
+    learning_rate=config_roundabout.learning_rate, 
+    buffer_size=config_roundabout.buffer_size, 
+    learning_starts=config_roundabout.learning_starts, 
+    batch_size=config_roundabout.batch_size, 
+    gamma=config_roundabout.gamma, 
+    train_freq=config_roundabout.train_frequency, 
+    exploration_fraction=config_roundabout.exploration_fraction, 
+    target_update_interval=config_roundabout.target_update_interval,
+    tensorboard_log="./DQN_Roundabout_Model_Eval_tensorboard",
+    verbose=1)
+model.learn(
+    total_timesteps=config_roundabout.total_timesteps, 
+    progress_bar=True, 
+    callback=config_tensorboard.HParamCallback())
+model.save("DQN_Roundabout_Model_Eval")
+######################################
 
 model = DQN.load("DQN_Roundabout_Model_Eval", env=env)
 

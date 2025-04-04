@@ -37,11 +37,11 @@ action_type = "DiscreteMetaAction"
 
 # The speed range for each vehicle is limited to 5-15 m/s.
 min_speed = 5
-max_speed = 15
+max_speed = 15 # 35 m/s
 
 #Reward function
 safety_distance = 10
-w1 = 25.0
+w1 = 15.0 
 w2 = 1.0
 w3 = 10.0
 w4 = 5.0

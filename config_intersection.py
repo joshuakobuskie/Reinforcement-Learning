@@ -41,15 +41,15 @@ max_speed = 15
 
 #Reward function
 safety_distance = 10
-w1 = 25.0
-w2 = 1.0
+w1 = 15.0
+w2 = 2.0
 w3 = 10.0
 w4 = 5.0
 
 #Hyperparameters
-learning_rate = 0.0005
+learning_rate = 0.001
 buffer_size  = 50000
-learning_starts = 200
+learning_starts = 1000
 batch_size = 128
 gamma = 0.95
 train_frequency = 4
