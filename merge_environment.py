@@ -59,10 +59,19 @@ class CustomMergeEnv(MergeEnv):
     
     def reset(self, **kwargs):
         obs, info = super().reset(**kwargs)
-    
-        #Initialize start position at the beginning of each episode
+        # Re-initialize start position
         self.start_pos = np.copy(self.vehicle.position)
-
+        # # Clear existing vehicles (except ego)
+        self.road.vehicles = [self.vehicle]
+        # Add new vehicles up to desired count
+        for _ in range(config_merge.vehicles_count - 1):
+            new_vehicle = highway_env.vehicle.behavior.IDMVehicle.create_random(
+                self.road,
+                speed=np.random.uniform(config_merge.initial_min_speed, config_merge.initial_max_speed),
+                spacing=1.5)
+            new_vehicle.MIN_SPEED = config_merge.min_speed
+            new_vehicle.MAX_SPEED = config_merge.max_speed
+            self.road.vehicles.append(new_vehicle)
         return obs, info
 
 # Register the custom environment
@@ -72,7 +81,8 @@ env = gymnasium.make("custom-merge-v0", render_mode="rgb_array", config={"other_
                                                                   "observation": {"type": config_merge.observation_type, 
                                                                   "vehicles_count": config_merge.observation_vehicles_count,
                                                                   "features": config_merge.observation_features},
-                                                                  "action": {"type": config_merge.action_type}})
+                                                                  "action": {"type": config_merge.action_type},
+                                                                  "vehicles_count": config_merge.vehicles_count})
 
 #Create model
 
@@ -101,7 +111,7 @@ print("Using device:", device)  # Check if GPU is available
 #     progress_bar=True,
 #     callback=config_tensorboard.HParamCallback())
 # model.save("DQN_Merge_Model_Eval")
-########################################
+###################################
 
 model = DQN.load("DQN_Merge_Model_Eval", env=env)
 
