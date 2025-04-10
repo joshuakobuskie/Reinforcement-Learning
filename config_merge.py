@@ -3,8 +3,8 @@ max_iters = 100
 
 #Paper configurations
 #Each vehicle was randomly generated within the specified range beneath the vehicles, and the initial velocity was also randomly set between 5 to 15 m/s.
-initial_min_speed = 5
-initial_max_speed = 15
+initial_min_speed = 0.1 #0.1
+initial_max_speed = 25 #25
 
 #HDV were implemented using Intelligent Driver Model (IDM) [9] and Minimizing Overall Braking Induced by Lane change (MOBIL)
 #IDMVehcile uses the IDM for longitudinal movement and MOBIL for lateral movement
@@ -20,7 +20,7 @@ observation_features = ["x", "y", "vx", "vy"]
 
 #An episode would terminate if a collision occurred or the ego vehicle passed a distance of 370m
 #Maximum distance of simulation
-max_distance = 370
+max_distance = 500
 
 #can perform five actions (Lane left, Idle, Lane right, faster, slower) through acceleration and steering control.
 action_type = "DiscreteMetaAction"
@@ -36,27 +36,27 @@ action_type = "DiscreteMetaAction"
 
 
 # The speed range for each vehicle is limited to 5-15 m/s.
-min_speed = 1
-max_speed = 20
+min_speed = 0.1 
+max_speed = 25 
 
 #Reward function
 safety_distance = 10
-w1 = 80.0
+w1 = 60.0
 w2 = 1.0
 w3 = 40.0
-w4 = 20.0
+w4 = 5.0
 
 #Hyperparameters
 learning_rate = 0.005
 buffer_size  = 15000
 learning_starts = 200
-batch_size = 32
-gamma = 0.8
+batch_size = 64
+gamma = 0.9
 train_frequency = 1
 exploration_fraction = 0.01
 target_update_interval = 50
 
-total_timesteps = 85000
+total_timesteps = 55000
 
 #defaults from the highway env
 # action = {'type': 'DiscreteMetaAction'}

@@ -41,11 +41,11 @@ class CustomRoundaboutEnv(RoundaboutEnv):
                 #Lateral
                 if vehicle.lane != self.vehicle.lane:
                     if distance < config_roundabout.safety_distance:
-                        reward += config_roundabout.w3 * (-1/distance)
+                        reward += config_roundabout.w4 * (-1/distance)
                 #Rear
                 else:
                     if distance < config_roundabout.safety_distance:
-                        reward += config_roundabout.w4 * (-1/distance)
+                        reward += config_roundabout.w3 * (-1/distance)
 
         return reward
     
