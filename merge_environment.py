@@ -99,8 +99,10 @@ class CustomMergeEnv(MergeEnv):
         #     )
         #     new_vehicle.MIN_SPEED = config_merge.min_speed
         #     new_vehicle.MAX_SPEED = config_merge.max_speed
-        #     self.road.vehicles.append(new_vehicle)        
-        # # print(f"Total vehicles: {len(self.road.vehicles)}")
+        #     self.road.vehicles.append(new_vehicle)
+        # actions = []
+        
+        # print(f"Total vehicles: {len(self.road.vehicles)}")
         return obs, info
 
 # Register the custom environment
@@ -122,7 +124,7 @@ env = gymnasium.make("custom-merge-v0", render_mode="rgb_array", config={"other_
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print("Using device:", device)  # Check if GPU is available
-#Uncomment when training a new model
+# #Uncomment when training a new model
 policy_kwargs = dict(net_arch=[64, 64], activation_fn=nn.ReLU)
 
 model = DQN("MlpPolicy", 
