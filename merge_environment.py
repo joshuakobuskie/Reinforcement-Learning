@@ -1,17 +1,18 @@
 import gymnasium
 import highway_env
+import time
 import config_merge
 import numpy as np
 import random
 import torch
 import torch.nn as nn
 from stable_baselines3 import DQN
-from matplotlib import pyplot as plt
 from highway_env.envs.merge_env import MergeEnv
 import config_tensorboard
 from tqdm import tqdm
 import curriculum_scheduler
 from stable_baselines3.common.callbacks import BaseCallback
+from highway_env.vehicle.behavior import IDMVehicle, AggressiveVehicle, DefensiveVehicle
 
 def euclidian_distance(pos_1, pos_2):
     return np.linalg.norm(np.array(pos_1) - np.array(pos_2))
@@ -60,54 +61,50 @@ class CustomMergeEnv(MergeEnv):
             done = True
         return obs, reward, done, truncated, info
 
-    def is_far_enough(new_pos, vehicles, min_dist=10.0):
-        for v in vehicles:
-            if hasattr(v, "position") and np.linalg.norm(np.array(v.position) - np.array(new_pos)) < min_dist:
-                return False
-        return True
-
     def reset(self, **kwargs):
         obs, info = super().reset(**kwargs)
         self.start_pos = np.copy(self.vehicle.position)
-        self.road.vehicles = [self.vehicle]
-        lane_edges = []
-        for from_node in self.road.network.graph:
-            for to_node in self.road.network.graph[from_node]:
-                lane_edges.append((from_node, to_node))
 
-        for i in range(self.vehicles_count - 1):
-            speed_clip = np.clip(
-                np.random.uniform(self.initial_min_speed, self.initial_max_speed),
-                self.min_speed,
-                self.max_speed
-            )
-            from_node, to_node = random.choice(lane_edges)
-            lane_count = len(self.road.network.graph[from_node][to_node])
+        ego = self.vehicle
+        ego.speed = np.random.uniform(self.initial_min_speed, self.initial_max_speed)
+        ego.MIN_SPEED = self.min_speed
+        ego.MAX_SPEED = self.max_speed
 
-            if self.curriculum_stage == 0:
-                lane_index = 0
-                x_offset = i * 30
-            elif self.curriculum_stage == 1:
-                lane_index = i % lane_count
-                x_offset = i * 20 + np.random.uniform(-2, 2)
-            else:
-                lane_index = random.randint(0, lane_count - 1)
-                x_offset = i * 15 + np.random.uniform(-5, 5)
+        new_vehicles = [ego]
 
-            lane = self.road.network.get_lane((from_node, to_node, lane_index))
-            position = lane.position(self.vehicle.position[0] + x_offset, 0)
-
-            if not self.is_far_enough(position, self.road.vehicles):
+        for v in self.road.vehicles:
+            if v is ego:
                 continue
 
-            new_vehicle = highway_env.vehicle.behavior.IDMVehicle(
-                self.road, position=position, speed=speed_clip
-            )
-            new_vehicle.MIN_SPEED = self.min_speed
-            new_vehicle.MAX_SPEED = self.max_speed
-            self.road.vehicles.append(new_vehicle)
+            # Choose behavior class based on curriculum
+            if self.curriculum_stage == 0:
+                vehicle_cls = IDMVehicle
+            elif self.curriculum_stage == 1:
+                vehicle_cls = DefensiveVehicle
+            elif self.curriculum_stage == 2:
+                vehicle_cls = AggressiveVehicle
+            elif self.curriculum_stage == 3:
+                vehicle_cls = random.choice([IDMVehicle, DefensiveVehicle, AggressiveVehicle])
+            else:
+                vehicle_cls = IDMVehicle  # fallback
 
+            new_v = vehicle_cls(
+                self.road,
+                position=v.position,
+                heading=v.heading,
+                speed=np.clip(np.random.uniform(self.initial_min_speed, self.initial_max_speed),
+                              self.min_speed, self.max_speed)
+            )
+            new_v.MIN_SPEED = self.min_speed
+            new_v.MAX_SPEED = self.max_speed
+
+            new_vehicles.append(new_v)
+
+        self.road.vehicles = new_vehicles
         return obs, info
+
+
+
 
 class CurriculumCallback(BaseCallback):
     def __init__(self, scheduler, hparam_callback, verbose=0):
@@ -126,16 +123,15 @@ class CurriculumCallback(BaseCallback):
             new_config = self.scheduler.get_env_config()
             self.training_env.envs[0].unwrapped.set_config(new_config)
             self.training_env.reset()
-            print(f"[Curriculum] Timestep {timestep} - Vehicles: {new_config['vehicles_count']}")
+            print(f"[Curriculum] Timestep {timestep} - Stage: {new_config["stage"]}")
         self.hparam_callback.on_step()
         return True
 
     def _on_training_end(self):
         self.hparam_callback.on_training_end()
 
-# Register the environment
+# Register the custom environment
 gymnasium.register(id="custom-merge-v0", entry_point="__main__:CustomMergeEnv")
-
 # Instantiate environment
 env = gymnasium.make("custom-merge-v0", render_mode="rgb_array", config={
     "other_vehicles_type": config_merge.other_vehicles_type,
@@ -150,39 +146,68 @@ env = gymnasium.make("custom-merge-v0", render_mode="rgb_array", config={
     "screen_width": 800,
     "screen_height": 200
 })
-
 # Model configuration
-policy_kwargs = dict(net_arch=[128, 128], activation_fn=nn.ReLU)
-model = DQN("MlpPolicy",
-            env,
-            policy_kwargs=policy_kwargs,
-            learning_rate=config_merge.learning_rate,
-            buffer_size=config_merge.buffer_size,
-            learning_starts=config_merge.learning_starts,
-            batch_size=config_merge.batch_size,
-            gamma=config_merge.gamma,
-            train_freq=config_merge.train_frequency,
-            exploration_fraction=config_merge.exploration_fraction,
-            target_update_interval=config_merge.target_update_interval,
-            tensorboard_log="./DQN_Merge_Model_Curriculum_tensorboard",
-            verbose=1)
+# policy_kwargs = dict(net_arch=[64, 64], activation_fn=nn.ReLU)
+# model = DQN("MlpPolicy",
+#             env,
+#             policy_kwargs=policy_kwargs,
+#             learning_rate=config_merge.learning_rate,
+#             buffer_size=config_merge.buffer_size,
+#             learning_starts=config_merge.learning_starts,
+#             batch_size=config_merge.batch_size,
+#             gamma=config_merge.gamma,
+#             train_freq=config_merge.train_frequency,
+#             exploration_fraction=config_merge.exploration_fraction,
+#             target_update_interval=config_merge.target_update_interval,
+#             tensorboard_log="./DQN_Merge_Model_Curriculum_tensorboard",
+#             verbose=1)
 
-scheduler = curriculum_scheduler.CurriculumScheduler()
-callback = CurriculumCallback(scheduler=scheduler, hparam_callback=config_tensorboard.HParamCallback())
+# scheduler = curriculum_scheduler.CurriculumScheduler()
+# callback = CurriculumCallback(scheduler=scheduler, hparam_callback=config_tensorboard.HParamCallback())
 
-model.learn(
-    total_timesteps=config_merge.total_timesteps,
-    progress_bar=True,
-    callback=callback
-)
+# model.learn(
+#     total_timesteps=config_merge.total_timesteps,
+#     progress_bar=True,
+#     callback=callback
+# )
 
-model.save("DQN_Merge_Model_Curriculum")
+# model.save("DQN_Merge_Model_Curriculum")
 
 # Evaluation
 model = DQN.load("DQN_Merge_Model_Curriculum", env=env)
-obs, info = env.reset()
-done = False
-while not done:
-    action, _ = model.predict(obs, deterministic=True)
-    obs, reward, done, truncated, info = env.step(action)
-    env.render()
+# obs, info = env.reset()
+# done = False
+# while not done:
+#     action, _ = model.predict(obs, deterministic=True)
+#     obs, reward, done, truncated, info = env.step(action)
+#     env.render()
+model = DQN.load("DQN_Merge_Model_Curriculum")
+
+# Loop through all curriculum stages
+
+for stage in range(4):
+    print(f"\n--- Evaluating Stage {stage} ---")
+
+    # Set environment stage manually
+
+    env.unwrapped.set_config({
+            "stage": stage,
+            "initial_min_speed": config_merge.initial_min_speed,
+            "initial_max_speed": config_merge.initial_max_speed,
+    })
+
+    obs, info = env.reset()
+    done = False
+    episode_reward = 0
+
+    while not done:
+        action, _ = model.predict(obs, deterministic=True)
+        obs, reward, done, truncated, info = env.step(action)
+        episode_reward += reward
+        env.render()  # Shows visual if using render_mode="human" or "rgb_array"
+        print(obs)
+
+        # Optional: Slow down rendering to observe
+        time.sleep(0.05)
+
+    print(f"Total reward (Stage {stage}): {episode_reward}")
