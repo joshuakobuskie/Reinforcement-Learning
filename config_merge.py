@@ -41,8 +41,8 @@ max_speed = 35
 
 #Reward functionIDMVehicle
 safety_distance = 10
-w1 = 55.0
-w2 = 2.0
+w1 = 50.0
+w2 = 1.0
 w3 = 20.0
 w4 = 5.0
 

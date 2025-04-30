@@ -42,11 +42,11 @@ class CustomIntersectionEnv(IntersectionEnv):
                 #Lateral
                 if vehicle.lane != self.vehicle.lane:
                     if distance < config_intersection.safety_distance:
-                        reward += config_intersection.w3 * (-1/distance)
+                        reward += config_intersection.w4 * (-1/distance)
                 #Rear
                 else:
                     if distance < config_intersection.safety_distance:
-                        reward += config_intersection.w4 * (-1/distance)
+                        reward += config_intersection.w3 * (-1/distance)
 
         return reward
     
@@ -97,7 +97,8 @@ model = DQN(
     train_freq=config_intersection.train_frequency,
     exploration_fraction=config_intersection.exploration_fraction,
     target_update_interval=config_intersection.target_update_interval,
-    verbose=1)
+    verbose=1,
+    device=device)
 
 model.learn(
     total_timesteps=config_intersection.total_timesteps, 

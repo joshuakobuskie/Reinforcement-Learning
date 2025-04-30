@@ -42,11 +42,11 @@ class CustomHighwayEnv(HighwayEnv):
                 #Lateral
                 if vehicle.lane != self.vehicle.lane:
                     if distance < config_highway.safety_distance:
-                        reward += config_highway.w3 * (-1/distance)
+                        reward += config_highway.w4 * (-1/distance)
                 #Rear
                 else:
                     if distance < config_highway.safety_distance:
-                        reward += config_highway.w4 * (-1/distance)
+                        reward += config_highway.w3 * (-1/distance)
 
         return reward
     

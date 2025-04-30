@@ -26,6 +26,7 @@ class CustomMergeEnv(MergeEnv):
         self.max_speed = config_merge.max_speed
         self.curriculum_stage = 0
         super().__init__(*args, **kwargs)
+        print(self.road.vehicles)
 
         for vehicle in self.road.vehicles:
             vehicle.speed = np.random.randint(self.initial_min_speed, self.initial_max_speed)
@@ -41,9 +42,11 @@ class CustomMergeEnv(MergeEnv):
             if vehicle != self.vehicle:
                 distance = euclidian_distance(self.vehicle.position, vehicle.position)
                 if vehicle.lane != self.vehicle.lane:
+                    #Lateral
                     if distance < config_merge.safety_distance:
                         reward += config_merge.w4 * (-1 / distance)
                 else:
+                    #Rear
                     if distance < config_merge.safety_distance:
                         reward += config_merge.w3 * (-1 / distance)
         return reward
@@ -65,15 +68,15 @@ class CustomMergeEnv(MergeEnv):
         obs, info = super().reset(**kwargs)
         self.start_pos = np.copy(self.vehicle.position)
 
-        ego = self.vehicle
-        ego.speed = np.random.uniform(self.initial_min_speed, self.initial_max_speed)
-        ego.MIN_SPEED = self.min_speed
-        ego.MAX_SPEED = self.max_speed
+        agent_vehicle = self.vehicle
+        agent_vehicle.speed = np.random.uniform(self.initial_min_speed, self.initial_max_speed)
+        agent_vehicle.MIN_SPEED = self.min_speed
+        agent_vehicle.MAX_SPEED = self.max_speed
 
-        new_vehicles = [ego]
+        new_vehicles = [agent_vehicle]
 
         for v in self.road.vehicles:
-            if v is ego:
+            if v is agent_vehicle:
                 continue
 
             # Choose behavior class based on curriculum
@@ -147,6 +150,8 @@ env = gymnasium.make("custom-merge-v0", render_mode="rgb_array", config={
     "screen_height": 200
 })
 # Model configuration
+# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# print("Using device:", device) 
 # policy_kwargs = dict(net_arch=[64, 64], activation_fn=nn.ReLU)
 # model = DQN("MlpPolicy",
 #             env,
@@ -162,29 +167,23 @@ env = gymnasium.make("custom-merge-v0", render_mode="rgb_array", config={
 #             tensorboard_log="./DQN_Merge_Model_Curriculum_tensorboard",
 #             verbose=1)
 
-# scheduler = curriculum_scheduler.CurriculumScheduler()
-# callback = CurriculumCallback(scheduler=scheduler, hparam_callback=config_tensorboard.HParamCallback())
+# scheduler = curriculum_scheduler.CurriculumScheduler().cuda()
+# callback = CurriculumCallback(scheduler=scheduler, hparam_callback=config_tensorboard.HParamCallback()).cuda()
 
 # model.learn(
 #     total_timesteps=config_merge.total_timesteps,
 #     progress_bar=True,
 #     callback=callback
-# )
+# ).cuda()
+# torch.cuda.synchronize()
 
 # model.save("DQN_Merge_Model_Curriculum")
 
 # Evaluation
 model = DQN.load("DQN_Merge_Model_Curriculum", env=env)
-# obs, info = env.reset()
-# done = False
-# while not done:
-#     action, _ = model.predict(obs, deterministic=True)
-#     obs, reward, done, truncated, info = env.step(action)
-#     env.render()
-model = DQN.load("DQN_Merge_Model_Curriculum")
-
 # Loop through all curriculum stages
 
+##### EVALUATE ONLY #############
 for stage in range(4):
     print(f"\n--- Evaluating Stage {stage} ---")
 
@@ -196,7 +195,7 @@ for stage in range(4):
             "initial_max_speed": config_merge.initial_max_speed,
     })
 
-    obs, info = env.reset()
+    obs, info = env.reset(seed=stage + 42)
     done = False
     episode_reward = 0
 
@@ -205,8 +204,6 @@ for stage in range(4):
         obs, reward, done, truncated, info = env.step(action)
         episode_reward += reward
         env.render()  # Shows visual if using render_mode="human" or "rgb_array"
-        print(obs)
-
         # Optional: Slow down rendering to observe
         time.sleep(0.05)
 
