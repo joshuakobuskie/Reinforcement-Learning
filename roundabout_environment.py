@@ -57,6 +57,13 @@ class CustomRoundaboutEnv(RoundaboutEnv):
     
     def reset(self, **kwargs):
         obs, info = super().reset(**kwargs)
+
+        #Set vehicle start speed between 5 and 15 m/s
+        #Set min of 5 and max of 15 m/s 
+        for vehicle in self.road.vehicles:
+            vehicle.speed = np.random.randint(config_roundabout.initial_min_speed, config_roundabout.initial_max_speed)
+            vehicle.MIN_SPEED = config_roundabout.min_speed
+            vehicle.MAX_SPEED = config_roundabout.max_speed
     
         #Initialize start position at the beginning of each episode
         self.start_pos = np.copy(self.vehicle.position)

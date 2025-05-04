@@ -57,6 +57,9 @@ class CustomMergeEnv(MergeEnv):
     
     def reset(self, **kwargs):
         obs, info = super().reset(**kwargs)
+    
+        #Initialize start position at the beginning of each episode
+        self.start_pos = np.copy(self.vehicle.position)
 
         #Set vehicle start speed between 5 and 15 m/s
         #Set min of 5 and max of 15 m/s 
@@ -64,9 +67,6 @@ class CustomMergeEnv(MergeEnv):
             vehicle.speed = np.random.randint(config_merge.initial_min_speed, config_merge.initial_max_speed)
             vehicle.MIN_SPEED = config_merge.min_speed
             vehicle.MAX_SPEED = config_merge.max_speed
-    
-        #Initialize start position at the beginning of each episode
-        self.start_pos = np.copy(self.vehicle.position)
 
         return obs, info
 
@@ -81,19 +81,54 @@ env = gymnasium.make("custom-merge-v0", render_mode="rgb_array", config={"other_
 
 ########################################
 # #Uncomment when training a new model
-policy_kwargs = dict(net_arch=[64, 64], activation_fn=nn.ReLU)
+# policy_kwargs = dict(net_arch=[64, 64], activation_fn=nn.ReLU)
 
-model = DQN("MlpPolicy", env, policy_kwargs=policy_kwargs, learning_rate=config_merge.learning_rate, buffer_size=config_merge.buffer_size, learning_starts=config_merge.learning_starts, batch_size=config_merge.batch_size, gamma=config_merge.gamma, train_freq=config_merge.train_frequency, exploration_fraction=config_merge.exploration_fraction, target_update_interval=config_merge.target_update_interval)
-model.learn(total_timesteps=config_merge.total_timesteps, progress_bar=True)
-model.save("DQN_Merge_Model")
+# model = DQN("MlpPolicy", env, policy_kwargs=policy_kwargs, learning_rate=config_merge.learning_rate, buffer_size=config_merge.buffer_size, learning_starts=config_merge.learning_starts, batch_size=config_merge.batch_size, gamma=config_merge.gamma, train_freq=config_merge.train_frequency, exploration_fraction=config_merge.exploration_fraction, target_update_interval=config_merge.target_update_interval)
+# model.learn(total_timesteps=config_merge.total_timesteps, progress_bar=True)
+# model.save("DQN_Merge_Model")
 ########################################
 
 model = DQN.load("DQN_Merge_Model", env=env)
 
-obs, info = env.reset()
-done = False
+collisions = 0
+avg_speed = 0.0
+avg_min_distance = 0.0
+num_episodes = 100
 
-while not done:
-    action, next_state = model.predict(obs, deterministic=True)
-    obs, reward, done, truncated, info = env.step(action)
-    env.render()
+for episode in range(num_episodes):
+    print(f"Episode: {episode}")
+    obs, info = env.reset()
+    done = False
+    
+    episode_speed_sum = 0.0
+    episode_min_distance_sum = 0.0
+    episode_steps = 0
+
+    while not done:
+        action, _ = model.predict(obs, deterministic=True)
+        obs, reward, done, truncated, info = env.step(action)
+        
+        episode_speed_sum += env.unwrapped.vehicle.speed
+
+        min_distance = config_merge.max_distance
+        for vehicle in env.unwrapped.road.vehicles:
+            if vehicle != env.unwrapped.vehicle and euclidian_distance(env.unwrapped.vehicle.position, vehicle.position) < min_distance:
+                min_distance = euclidian_distance(env.unwrapped.vehicle.position, vehicle.position)
+            
+        episode_min_distance_sum += min_distance
+        episode_steps += 1
+    
+    collisions += int(env.unwrapped.vehicle.crashed)
+    if episode_steps > 0:
+        avg_min_distance += (episode_min_distance_sum / episode_steps)
+
+    if episode_steps > 0:
+        avg_speed += (episode_speed_sum / episode_steps)
+
+collision_rate = collisions / num_episodes
+average_speed = avg_speed / num_episodes
+average_min_distance = avg_min_distance / num_episodes
+
+print(f"Collision Rate: {collision_rate*100}%")
+print(f"Average Speed: {average_speed} m/s")
+print(f"Average Nearest Vehicle Distance: {average_min_distance} meters")

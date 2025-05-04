@@ -57,6 +57,13 @@ class CustomHighwayEnv(HighwayEnv):
     
     def reset(self, **kwargs):
         obs, info = super().reset(**kwargs)
+
+        #Set vehicle start speed between 5 and 15 m/s
+        #Set min of 5 and max of 15 m/s 
+        for vehicle in self.road.vehicles:
+            vehicle.speed = np.random.randint(config_highway.initial_min_speed, config_highway.initial_max_speed)
+            vehicle.MIN_SPEED = config_highway.min_speed
+            vehicle.MAX_SPEED = config_highway.max_speed
     
         #Initialize start position at the beginning of each episode
         self.start_pos = np.copy(self.vehicle.position)
