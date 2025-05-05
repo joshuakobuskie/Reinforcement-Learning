@@ -200,50 +200,50 @@ model = DQN.load("DQN_Merge_Model_Curriculum", env=env)
 # Loop through all curriculum stages
 
 
-collisions = 0
-avg_speed = 0.0
-avg_min_distance = 0.0
-num_episodes = 10000
+# collisions = 0
+# avg_speed = 0.0
+# avg_min_distance = 0.0
+# num_episodes = 10000
 
-for episode in range(num_episodes):
-    print(f"Episode: {episode}")
-    obs, info = env.reset()
-    done = False
+# for episode in range(num_episodes):
+#     print(f"Episode: {episode}")
+#     obs, info = env.reset()
+#     done = False
 
-    episode_speed_sum = 0.0
-    episode_min_distance_sum = 0.0
-    episode_steps = 0
+#     episode_speed_sum = 0.0
+#     episode_min_distance_sum = 0.0
+#     episode_steps = 0
 
-    while not done:
-        print(f"Speed: {env.unwrapped.vehicle.speed}")
+#     while not done:
+#         print(f"Speed: {env.unwrapped.vehicle.speed}")
 
-        action, _ = model.predict(obs, deterministic=True)
-        obs, reward, done, truncated, info = env.step(action)
+#         action, _ = model.predict(obs, deterministic=True)
+#         obs, reward, done, truncated, info = env.step(action)
 
-        episode_speed_sum += env.unwrapped.vehicle.speed
+#         episode_speed_sum += env.unwrapped.vehicle.speed
 
-        min_distance = config_merge.max_distance
-        for vehicle in env.unwrapped.road.vehicles:
-            if vehicle != env.unwrapped.vehicle and euclidian_distance(env.unwrapped.vehicle.position, vehicle.position) < min_distance:
-                min_distance = euclidian_distance(env.unwrapped.vehicle.position, vehicle.position)
+#         min_distance = config_merge.max_distance
+#         for vehicle in env.unwrapped.road.vehicles:
+#             if vehicle != env.unwrapped.vehicle and euclidian_distance(env.unwrapped.vehicle.position, vehicle.position) < min_distance:
+#                 min_distance = euclidian_distance(env.unwrapped.vehicle.position, vehicle.position)
 
-        episode_min_distance_sum += min_distance
-        episode_steps += 1
+#         episode_min_distance_sum += min_distance
+#         episode_steps += 1
 
-    collisions += int(env.unwrapped.vehicle.crashed)
-    if episode_steps > 0:
-        avg_min_distance += (episode_min_distance_sum / episode_steps)
+#     collisions += int(env.unwrapped.vehicle.crashed)
+#     if episode_steps > 0:
+#         avg_min_distance += (episode_min_distance_sum / episode_steps)
 
-    if episode_steps > 0:
-        avg_speed += (episode_speed_sum / episode_steps)
+#     if episode_steps > 0:
+#         avg_speed += (episode_speed_sum / episode_steps)
 
-collision_rate = collisions / num_episodes
-average_speed = avg_speed / num_episodes
-average_min_distance = avg_min_distance / num_episodes
+# collision_rate = collisions / num_episodes
+# average_speed = avg_speed / num_episodes
+# average_min_distance = avg_min_distance / num_episodes
 
-print(f"Collision Rate: {collision_rate*100}%")
-print(f"Average Speed: {average_speed} m/s")
-print(f"Average Nearest Vehicle Distance: {average_min_distance} meters")
+# print(f"Collision Rate: {collision_rate*100}%")
+# print(f"Average Speed: {average_speed} m/s")
+# print(f"Average Nearest Vehicle Distance: {average_min_distance} meters")
 
 
 

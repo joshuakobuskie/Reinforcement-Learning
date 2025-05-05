@@ -13,7 +13,7 @@ class CurriculumScheduler:
             self.stage = 3
 
     def get_env_config(self):
-        base_vehicle_count = 10
+        base_vehicle_count = 5
         if self.stage == 0:
             return {"initial_min_speed": 0.001, "initial_max_speed": 15, "vehicles_count": base_vehicle_count, "stage": 0}
         elif self.stage == 1:
