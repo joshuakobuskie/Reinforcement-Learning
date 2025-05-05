@@ -26,7 +26,6 @@ class CustomMergeEnv(MergeEnv):
         self.max_speed = config_merge.max_speed
         self.curriculum_stage = 0
         super().__init__(*args, **kwargs)
-        print(self.road.vehicles)
 
         for vehicle in self.road.vehicles:
             vehicle.speed = np.random.randint(self.initial_min_speed, self.initial_max_speed)
@@ -58,6 +57,7 @@ class CustomMergeEnv(MergeEnv):
         if "stage" in new_config:
             self.curriculum_stage = new_config["stage"]
 
+
     def step(self, action):
         obs, reward, done, truncated, info = super().step(action)
         if euclidian_distance(self.start_pos, self.vehicle.position) >= config_merge.max_distance:
@@ -75,11 +75,28 @@ class CustomMergeEnv(MergeEnv):
 
         new_vehicles = [agent_vehicle]
 
-        for v in self.road.vehicles:
-            if v is agent_vehicle:
-                continue
+        # Determine how many vehicles to create based on the config
+        target_vehicle_count = self.vehicles_count
+        existing_vehicles = [v for v in self.road.vehicles if v is not agent_vehicle]
 
-            # Choose behavior class based on curriculum
+        # Keep up to (target - 1) from existing vehicles
+        retained_vehicles = existing_vehicles[:target_vehicle_count - 1]
+        additional_needed = max(0, (target_vehicle_count - 1) - len(retained_vehicles))
+        placeholders = [None] * additional_needed
+        all_vehicles = retained_vehicles + placeholders
+
+        for v in all_vehicles:
+            if v is not None:
+                pos = v.position
+                heading = v.heading
+            else:
+                lane = random.choice(self.road.network.lanes_list())
+                longitudinal = np.random.uniform(0, lane.length)
+                lateral = 0
+                pos = lane.position(longitudinal, lateral)
+                heading = lane.heading_at(longitudinal)
+
+            # Choose vehicle class based on curriculum
             if self.curriculum_stage == 0:
                 vehicle_cls = IDMVehicle
             elif self.curriculum_stage == 1:
@@ -89,12 +106,12 @@ class CustomMergeEnv(MergeEnv):
             elif self.curriculum_stage == 3:
                 vehicle_cls = random.choice([IDMVehicle, DefensiveVehicle, AggressiveVehicle])
             else:
-                vehicle_cls = IDMVehicle  # fallback
+                vehicle_cls = IDMVehicle
 
             new_v = vehicle_cls(
                 self.road,
-                position=v.position,
-                heading=v.heading,
+                position=pos,
+                heading=heading,
                 speed=np.clip(np.random.uniform(self.initial_min_speed, self.initial_max_speed),
                               self.min_speed, self.max_speed)
             )
@@ -144,8 +161,7 @@ env = gymnasium.make("custom-merge-v0", render_mode="rgb_array", config={
         "features": config_merge.observation_features
     },
     "action": {"type": config_merge.action_type},
-    "vehicles_count": config_merge.vehicles_count,
-    "scaling": 4.0,
+    "scaling": 6.0,
     "screen_width": 800,
     "screen_height": 200
 })
@@ -167,8 +183,8 @@ env = gymnasium.make("custom-merge-v0", render_mode="rgb_array", config={
 #             tensorboard_log="./DQN_Merge_Model_Curriculum_tensorboard",
 #             verbose=1)
 
-# scheduler = curriculum_scheduler.CurriculumScheduler().cuda()
-# callback = CurriculumCallback(scheduler=scheduler, hparam_callback=config_tensorboard.HParamCallback()).cuda()
+scheduler = curriculum_scheduler.CurriculumScheduler()
+callback = CurriculumCallback(scheduler=scheduler, hparam_callback=config_tensorboard.HParamCallback())
 
 # model.learn(
 #     total_timesteps=config_merge.total_timesteps,
@@ -183,22 +199,69 @@ env = gymnasium.make("custom-merge-v0", render_mode="rgb_array", config={
 model = DQN.load("DQN_Merge_Model_Curriculum", env=env)
 # Loop through all curriculum stages
 
+
+collisions = 0
+avg_speed = 0.0
+avg_min_distance = 0.0
+num_episodes = 10000
+
+for episode in range(num_episodes):
+    print(f"Episode: {episode}")
+    obs, info = env.reset()
+    done = False
+
+    episode_speed_sum = 0.0
+    episode_min_distance_sum = 0.0
+    episode_steps = 0
+
+    while not done:
+        print(f"Speed: {env.unwrapped.vehicle.speed}")
+
+        action, _ = model.predict(obs, deterministic=True)
+        obs, reward, done, truncated, info = env.step(action)
+
+        episode_speed_sum += env.unwrapped.vehicle.speed
+
+        min_distance = config_merge.max_distance
+        for vehicle in env.unwrapped.road.vehicles:
+            if vehicle != env.unwrapped.vehicle and euclidian_distance(env.unwrapped.vehicle.position, vehicle.position) < min_distance:
+                min_distance = euclidian_distance(env.unwrapped.vehicle.position, vehicle.position)
+
+        episode_min_distance_sum += min_distance
+        episode_steps += 1
+
+    collisions += int(env.unwrapped.vehicle.crashed)
+    if episode_steps > 0:
+        avg_min_distance += (episode_min_distance_sum / episode_steps)
+
+    if episode_steps > 0:
+        avg_speed += (episode_speed_sum / episode_steps)
+
+collision_rate = collisions / num_episodes
+average_speed = avg_speed / num_episodes
+average_min_distance = avg_min_distance / num_episodes
+
+print(f"Collision Rate: {collision_rate*100}%")
+print(f"Average Speed: {average_speed} m/s")
+print(f"Average Nearest Vehicle Distance: {average_min_distance} meters")
+
+
+
+
+
 ##### EVALUATE ONLY #############
 for stage in range(4):
     print(f"\n--- Evaluating Stage {stage} ---")
 
     # Set environment stage manually
-
-    env.unwrapped.set_config({
-            "stage": stage,
-            "initial_min_speed": config_merge.initial_min_speed,
-            "initial_max_speed": config_merge.initial_max_speed,
-    })
+    scheduler.stage = stage 
+    stage_config = scheduler.get_env_config()
+    env.unwrapped.set_config(stage_config)
 
     obs, info = env.reset(seed=stage + 42)
     done = False
     episode_reward = 0
-
+    print(f"Vehicle count: {len(env.unwrapped.road.vehicles)}")
     while not done:
         action, _ = model.predict(obs, deterministic=True)
         obs, reward, done, truncated, info = env.step(action)
@@ -207,4 +270,4 @@ for stage in range(4):
         # Optional: Slow down rendering to observe
         time.sleep(0.05)
 
-    print(f"Total reward (Stage {stage}): {episode_reward}")
+    print(f"Total reward for one episode (Stage {stage}): {episode_reward}")

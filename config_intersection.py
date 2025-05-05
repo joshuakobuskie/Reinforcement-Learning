@@ -3,7 +3,7 @@ max_iters = 100
 
 #Paper configurations
 #Each vehicle was randomly generated within the specified range beneath the vehicles, and the initial velocity was also randomly set between 5 to 15 m/s.
-initial_min_speed = 5
+initial_min_speed = 0.001
 initial_max_speed = 15
 
 #HDV were implemented using Intelligent Driver Model (IDM) [9] and Minimizing Overall Braking Induced by Lane change (MOBIL)
@@ -36,26 +36,26 @@ action_type = "DiscreteMetaAction"
 
 
 # The speed range for each vehicle is limited to 5-15 m/s. (If good performance, then modify to 25 m/s)
-min_speed = 5
-max_speed = 15
+min_speed = 0.0
+max_speed = 35
 
 #Reward function
 safety_distance = 10
-w1 = 15.0
-w2 = 2.0
-w3 = 10.0
-w4 = 5.0
+w1 = 50.0 #15
+w2 = 1.5 #2
+w3 = 20.0 #10
+w4 = 4.0 #5
 
 #Hyperparameters
 learning_rate = 0.001
-buffer_size  = 50000
-learning_starts = 1000
-batch_size = 128
-gamma = 0.95
-train_frequency = 4
-exploration_fraction = 0.1
-target_update_interval = 5000
-total_timesteps = 35000
+buffer_size  = 15000
+learning_starts = 200
+batch_size = 32
+gamma = 0.85
+train_frequency = 1
+exploration_fraction = 0.01
+target_update_interval = 50
+total_timesteps = 60000
 
 #defaults from the highway env
 # action = {'type': 'DiscreteMetaAction'}
@@ -84,5 +84,5 @@ total_timesteps = 35000
 # screen_width = 600
 # show_trajectories = False
 # simulation_frequency = 15
-# vehicles_count = 50
-# vehicles_density = 1
+vehicles_count = 10
+vehicles_density = 1
