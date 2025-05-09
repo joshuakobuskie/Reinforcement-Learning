@@ -56,7 +56,7 @@ train_frequency = 1
 exploration_fraction = 0.01
 target_update_interval = 50
 
-total_timesteps = 60000
+total_timesteps = 160000
 
 #defaults from the highway env
 # action = {'type': 'DiscreteMetaAction'}

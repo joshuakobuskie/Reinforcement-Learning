@@ -161,7 +161,7 @@ env = gymnasium.make("custom-merge-v0", render_mode="rgb_array", config={
         "features": config_merge.observation_features
     },
     "action": {"type": config_merge.action_type},
-    "scaling": 6.0,
+    "scaling": 4.0,
     "screen_width": 800,
     "screen_height": 200
 })
